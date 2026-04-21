@@ -1,42 +1,65 @@
-class Solution {
-public:
-    bool vis[55][55];
-    vector<pair<int,int>> d =  {{0,-1},{0,1},{-1,0},{1,0}};
-    int n,m,cnt,mx;
+#include <bits/stdc++.h>
+using namespace std;
 
-    bool valid(int i, int j)
-    {
-        if(i<0 || i>=n || j<0 || j>=m)
-            return false;
-        return true;
-    }
+int n, m;
+char grid[1005][1005];
+bool visited[1005][1005];
 
-    void dfs(int si, int sj, vector<vector<int>>& grid)
-    {
-        vis[si][sj] = true;
-        cnt++;
-        for(int i=0;i<4;i++)
-        {
-            int ci = si + d[i].first;
-            int cj = sj + d[i].second;
-            if(valid(ci,cj) && !vis[ci][cj] && grid[ci][cj]==1)
-                dfs(ci,cj,grid);
+int di[4] = {-1, 1, 0, 0};
+int dj[4] = {0, 0, -1, 1};
+
+bool valid(int i, int j) {
+    if(i < 0 || i >= n || j < 0 || j >= m)
+        return false;
+    if(grid[i][j] == '-')
+        return false;
+    if(visited[i][j])
+        return false;
+    return true;
+}
+
+int dfs(int si, int sj) {
+    visited[si][sj] = true;
+    int count = 1;
+
+    for(int k = 0; k < 4; k++) {
+        int ni = si + di[k];
+        int nj = sj + dj[k];
+
+        if(valid(ni, nj)) {
+            count += dfs(ni, nj);
         }
     }
 
-    int maxAreaOfIsland(vector<vector<int>>& grid) {
-        n = grid.size();
-        m = grid[0].size();
-        mx = 0;
-        memset(vis,false,sizeof(vis));
-        for(int i=0;i<n;i++)
-            for(int j=0;j<m;j++)
-                if(!vis[i][j] && grid[i][j]==1)
-                {
-                    cnt = 0;
-                    dfs(i,j,grid);
-                    mx = max(cnt,mx);
-                }
-        return mx;
+    return count;
+}
+
+int main() {
+    cin >> n >> m;
+
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            cin >> grid[i][j];
+        }
     }
-};
+
+    int min_area = INT_MAX;
+    bool found = false;
+
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < m; j++) {
+            if(grid[i][j] == '.' && !visited[i][j]) {
+                int area = dfs(i, j);
+                min_area = min(min_area, area);
+                found = true;
+            }
+        }
+    }
+
+    if(!found)
+        cout << -1 << endl;
+    else
+        cout << min_area << endl;
+
+    return 0;
+}
